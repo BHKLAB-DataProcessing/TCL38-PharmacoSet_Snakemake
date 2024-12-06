@@ -1,0 +1,64 @@
+---
+title: "QC of the TCL38 PSet"
+author: "Julia Nguyen"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{R}
+setwd("~/TCL38")
+suppressMessages(library(data.table))
+suppressMessages(library(S4Vectors))
+suppressMessages(library(CoreGx))
+suppressMessages(library(PharmacoGx))
+load("PSet_TCL38_23.rds")
+```
+
+### CHECK: colData for each molecularProfile matches sample dataframe
+
+```{R}
+# get colData for each molecularProfile
+variant_colData <- tcl38@molecularProfiles$variant@colData
+rnaseq_colData <- tcl38@molecularProfiles$rnaseq@colData
+acgh_colData <- tcl38@molecularProfiles$acgh@colData
+
+# confirm all samples in colData can be mapped back to the PSet sample dataframe
+table(rownames(variant_colData) %in% rownames(tcl38@sample))
+table(rownames(rnaseq_colData) %in% rownames(tcl38@sample))
+table(rownames(acgh_colData) %in% tcl38@sample$sampleid)
+```
+
+
+### CHECK: colData matches assays for each molecularProfile 
+
+```{R}
+# get assays for each molecularProfile
+variant_assay <- tcl38@molecularProfiles$variant@assays@data$assay
+rnaseq_assay <- tcl38@molecularProfiles$rnaseq@assays@data$exprs
+acgh_assay <- tcl38@molecularProfiles$acgh@assays@data$assay
+
+# confirm all sample names map directly (same order) between assay and colData
+table(colnames(variant_assay) == rownames(variant_colData))
+table(colnames(rnaseq_assay) == rownames(rnaseq_colData))
+table(colnames(acgh_assay) == rownames(acgh_colData))
+```
+
+### CHECK: elementMetadata matches assays for each molecularProfile 
+
+```{R}
+# get elementMetadata for each molecularProfile
+variant_emData <- tcl38@molecularProfiles$variant@elementMetadata
+rnaseq_emData <- tcl38@molecularProfiles$rnaseq@elementMetadata
+acgh_emData <- tcl38@molecularProfiles$acgh@elementMetadata
+
+# confirm all genomic features map directly (same order) between assay and
+# elementMetadata
+table(rownames(variant_assay) == variant_emData$Coord)
+table(rownames(rnaseq_assay) == rnaseq_emData$gene_id)
+table(rownames(acgh_assay) == 
+        paste0(acgh_emData$cellid,"_",acgh_emData$abberation_num))
+```

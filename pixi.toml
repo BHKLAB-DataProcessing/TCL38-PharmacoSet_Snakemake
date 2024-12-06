@@ -1,0 +1,35 @@
+[project]
+authors = ["Jermiah <jermiahjoseph98@gmail.com>"]
+channels = ["conda-forge", "bioconda"]
+description = "Add a short description here"
+name = "TCL38"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+dag = "snakemake -F --dag | dot -Tsvg > resources/dag.svg"
+rulegraph = "snakemake -F --rulegraph | dot -Tsvg > resources/rulegraph.svg"
+filegraph = "snakemake -F --filegraph | dot -Tsvg > resources/filegraph.svg"
+graphs = { depends_on = [
+  "dag",
+  "rulegraph",
+  "filegraph",
+], description = "Generate all the graphs" }
+
+
+
+[dependencies]
+r-base = "*"
+radian = ">=0.6.13,<0.7"
+r-essentials = "*"
+r-devtools = "*"
+r-pak = ">=0.8.0,<0.9"
+r-biocmanager = "*"
+bioconductor-biocstyle = ">=2.30.0,<3"
+bioconductor-biobase = "*"
+libcurl = ">=8.10.1,<9"
+r-rcurl = "*"
+r-rmarkdown = "*"
+snakemake = ">=8.25.5,<9"
+bioconductor-pharmacogx = ">=3.6.0,<4"
+r-log4r = ">=0.4.4,<0.5"

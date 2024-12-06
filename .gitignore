@@ -1,0 +1,12 @@
+rawdata
+procdata
+results
+
+# pixi environments
+.pixi
+*.egg-info
+.snakemake
+logs
+.vscode
+
+.old
