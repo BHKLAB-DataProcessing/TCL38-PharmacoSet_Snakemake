@@ -68,19 +68,17 @@ stopifnot(all(allSamples %in% sampleMetadata$sampleid))
 
 treSamples <- tre@colData$sampleid |> 
     unique() 
+
 if (!all(treSamples %in% sampleMetadata$sampleid)) {
-    # stop("Not all samples in the TreatmentResponseExperiment are in the sampleMetadata")
-  missing <- setdiff(treSamples, sampleMetadata$sampleid)
-  
-  sampleMetadata$sampleid_capitalized <- sampleMetadata$sampleid
-
-  
-
+  missing <- treSamples[!treSamples %in% sampleMetadata$sampleid]
+  error(logger, paste("The following samples are missing from the sampleMetadata:", paste(missing, collapse = ", ")))
+  stop("Not all samples in the TreatmentResponseExperiment are in the sampleMetadata")
 }
 
 allTreatments <- unique(tre@rowData$treatmentid)
 
 # Check if all the treatments in the TreatmentResponseExperiment are in the treatmentMetadata
+# this should be true since treatmentMetadata is created from the TreatmentResponseExperiment
 stopifnot(all(allTreatments %in% treatmentMetadata$treatmentid))
 
 ## ------------------------------------------------------------------------- ##

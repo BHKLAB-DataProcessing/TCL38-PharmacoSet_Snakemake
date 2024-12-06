@@ -41,7 +41,8 @@ options("log_level" = "INFO")   # AnnotationGx logging level
 ###############################################################################
 # Load INPUT
 ###############################################################################
-tre <- readRDS(INPUT$tre)
+
+
 syn_data <- readRDS(INPUT$treatment_syn_rds) |> data.table::as.data.table()
 
 extracted_meta <- syn_data[
@@ -56,8 +57,39 @@ extracted_meta <- syn_data[
 ] |> unique()
 extracted_meta
 
-t1 <- tre@rowData$treatment1id |> unique()
-t2 <- tre@rowData$treatment2id |> unique()
+mono_processed <- data.table::fread(INPUT$mono_processed)
+combo_processed <- data.table::fread(INPUT$combo_processed)
+
+# create drug index for single-agent response
+info(logger, "Creating drug index for single-agent response...")
+Index <- data.frame(treatmentid = unique(mono_processed$treatmentid), 
+                    index = 1:length(unique(mono_processed$treatmentid)))
+info(logger, "Drug index created.")
+
+# format individual response data
+info(logger, "Formatting individual response data...")
+mono_processed$TreatmentIndex <- Index$index[match(mono_processed$treatmentid, Index$treatmentid)]
+mono_processed$treatment2id <- mono_processed$treatment1conc <- mono_processed$treatment2conc <- mono_processed$ConcUnit <- mono_processed$viability <- combo_processed$dss <- NA
+combo_processed$PairIndex <- combo_processed$PairIndex + 173
+
+mono_processed$Testing <- "Single-Agent"
+combo_processed$Testing <- "Combo"
+
+data.table::setnames(mono_processed, c("treatmentid"), c("treatment1id"))
+data.table::setnames(combo_processed, c("PairIndex"), c("TreatmentIndex"))
+
+combined_raw_treatment <- rbind(mono_processed, combo_processed)
+info(logger, "Individual response data formatted.")
+
+order_col <- c("TreatmentIndex", "Testing", "sampleid", "treatment1id", "treatment2id", "treatment1conc", "treatment2conc", "dss", "viability", "ConcUnit")
+combined_raw_treatment <- combined_raw_treatment[, ..order_col]
+info(logger, "Combined raw treatment data created.")
+
+# capitalize sampleid
+combined_raw_treatment$sampleid <- toupper(combined_raw_treatment$sampleid)
+
+t1 <- combined_raw_treatment$treatment1id |> unique()
+t2 <- combined_raw_treatment$treatment2id |> unique()
 
 # combine into single unique list
 treatments <- c(t1, t2) |> unique() 
@@ -73,9 +105,6 @@ treatment_metadata <- merge(
 )
 
 ###############################################################################
-
-
-
 
 (compound_nameToCIDS <- AnnotationGx::mapCompound2CID(
     treatments,

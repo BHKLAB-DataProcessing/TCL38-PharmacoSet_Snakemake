@@ -68,7 +68,7 @@ combined_raw_treatment <- combined_raw_treatment[, ..order_col]
 info(logger, "Combined raw treatment data created.")
 
 # capitalize sampleid
-combined_raw_treatment$sampleid_capitalized <- toupper(combined_raw_treatment$sampleid)
+combined_raw_treatment$sampleid <- toupper(combined_raw_treatment$sampleid)
 
 # create treatment response experiment
 info(logger, "Creating treatment response experiment...")

@@ -20,7 +20,8 @@ rule make_PSET:
 
 rule make_treatmentMetadata:
   input:
-    tre = PROCDATA / "TCL38_TRE.RDS",
+    mono_processed = PROCDATA / "mono_treatment_response.csv",
+    combo_processed = PROCDATA / "combo_treatment_response.csv",
     treatment_syn_rds = METADATA / "ZIPsynergyTCL38.RDS"
   output:
     treatment_metadata = PROCDATA / "treatment-metadata.csv"
