@@ -83,13 +83,40 @@ stopifnot(all(allTreatments %in% treatmentMetadata$treatmentid))
 
 ## ------------------------------------------------------------------------- ##
 
+treatmentMetadata <- treatmentMetadata[!duplicated(treatmentid),]
+treatment_df <-  data.frame(
+    treatmentMetadata, 
+    row.names = treatmentMetadata$treatmentid)
+
+sampleMetadata <- sampleMetadata[!duplicated(sampleid),]
+sample_df <- data.frame(
+    sampleMetadata, 
+    row.names = sampleMetadata$sampleid
+)
+
 
 ## ------------------------------------------------------------------------- ##
-# Do something
 
+name <- "TCL38"
 
-
+pset <- PharmacoGx::PharmacoSet2(
+  name = name,
+  treatment = treatment_df,
+  sample = sample_df,
+  molecularProfiles = mae,
+  treatmentResponse = tre,
+  curation = list(
+    sample = sample_df,
+    treatment = treatment_df,
+    tissue = data.frame()
+  ),
+  datasetType = "sensitivity"
+)
 
 ###############################################################################
 # Save OUTPUT 
 ###############################################################################
+
+info(logger, "Saving output files...")
+saveRDS(pset, OUTPUT$pset)
+info(logger, "Output files saved successfully.")
