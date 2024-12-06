@@ -67,6 +67,9 @@ order_col <- c("TreatmentIndex", "Testing", "sampleid", "treatment1id", "treatme
 combined_raw_treatment <- combined_raw_treatment[, ..order_col]
 info(logger, "Combined raw treatment data created.")
 
+# capitalize sampleid
+combined_raw_treatment$sampleid_capitalized <- toupper(combined_raw_treatment$sampleid)
+
 # create treatment response experiment
 info(logger, "Creating treatment response experiment...")
 tremapper <- CoreGx::TREDataMapper(rawdata = combined_raw_treatment)

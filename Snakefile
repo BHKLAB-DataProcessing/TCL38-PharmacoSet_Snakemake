@@ -3,30 +3,60 @@ from pathlib import Path
 RAWDATA = Path("rawdata")
 PROCDATA = Path("procdata")
 METADATA =  Path("metadata")
+RESULTS = Path("results")
 
 rule make_PSET:
   input:
     tre = PROCDATA / "TCL38_TRE.RDS",
     mae = PROCDATA / "TCL38_MAE.RDS",
+    processed_sample_metadata = PROCDATA / "sample-metadata.csv",
+    processed_treatment_metadata = PROCDATA / "treatment-metadata.csv"
   output:
-    pset = PROCDATA / "TCL38_pset.RDS"
+    pset = RESULTS / "TCL38_PSet.RDS"
   log:
     "logs/make_PSET.log"
   script:
     "workflow/scripts/make_PSET.R"
 
+rule make_treatmentMetadata:
+  input:
+    tre = PROCDATA / "TCL38_TRE.RDS",
+    treatment_syn_rds = METADATA / "ZIPsynergyTCL38.RDS"
+  output:
+    treatment_metadata = PROCDATA / "treatment-metadata.csv"
+  log:
+    "logs/make_treatmentMetadata.log"
+  conda:
+    "workflow/envs/annotationgx.yaml"
+  threads:
+    4
+  script:
+    "workflow/scripts/make_treatmentMetadata.R"
+
+rule make_sampleMetadata:
+  input:
+    sample_metadata = METADATA / "sample-metadata.xlsx"
+  output:
+    processed_sample_metadata = PROCDATA / "sample-metadata.csv"
+  log:
+    "logs/make_sampleMetadata.log"
+  conda:
+    "workflow/envs/annotationgx.yaml"
+  threads:
+    4
+  script:
+    "workflow/scripts/make_sampleMetadata.R"
+
 rule make_TRE:
   input:
     mono_processed = PROCDATA / "mono_treatment_response.csv",
     combo_processed = PROCDATA / "combo_treatment_response.csv",
-    # sample_metadata = METADATA / "sample-metadata.xlsx",
   output:
     tre = PROCDATA / "TCL38_TRE.RDS"
   log:
     "logs/make_TRE.log"
   script:
     "workflow/scripts/make_TRE.R"
-
 
 rule process_combotherapy:
   input:

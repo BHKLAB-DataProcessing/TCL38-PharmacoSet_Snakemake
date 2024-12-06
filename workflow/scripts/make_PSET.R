@@ -26,20 +26,64 @@ if(exists("snakemake")){
   file.path("resources", "make_PSET.RData") |>
     load()
 }
-
+library(log4r)
+library(data.table)
+suppressMessages(library(PharmacoGx))
+logger <- create.logger(logfile = stdout(), level = "DEBUG")
+info(logger, "Starting process...")
 
 ###############################################################################
 # Load INPUT
 ###############################################################################
+info(logger, "Loading input files...")
+tre <- readRDS(INPUT$tre)
+info(logger, "Treatment response experiment loaded successfully.")
+mae <- readRDS(INPUT$mae)
+info(logger, "Monotherapy activity experiment loaded successfully.")
 
 
+sampleMetadata <- data.table::fread(INPUT$processed_sample_metadata)
+info(logger, "Sample metadata loaded successfully.")
 
+treatmentMetadata <- data.table::fread(INPUT$processed_treatment_metadata)
+info(logger, "Treatment metadata loaded successfully.")
 
 ###############################################################################
 # Main Script
 ###############################################################################
 
 
+## ------------------------------------------------------------------------- ##
+# SANITY CHECKS
+
+# Need to make sure that the sampleMetadata and the colnames of the summarized
+# experiments are the same
+
+allSamples <- sapply(names(mae), function(se) colnames(mae[[se]])) |>
+    unlist() |>
+    unique()
+
+# Check if all the samples in the MultiAssayExperiment are in the sampleMetadata
+stopifnot(all(allSamples %in% sampleMetadata$sampleid))
+
+treSamples <- tre@colData$sampleid |> 
+    unique() 
+if (!all(treSamples %in% sampleMetadata$sampleid)) {
+    # stop("Not all samples in the TreatmentResponseExperiment are in the sampleMetadata")
+  missing <- setdiff(treSamples, sampleMetadata$sampleid)
+  
+  sampleMetadata$sampleid_capitalized <- sampleMetadata$sampleid
+
+  
+
+}
+
+allTreatments <- unique(tre@rowData$treatmentid)
+
+# Check if all the treatments in the TreatmentResponseExperiment are in the treatmentMetadata
+stopifnot(all(allTreatments %in% treatmentMetadata$treatmentid))
+
+## ------------------------------------------------------------------------- ##
 
 
 ## ------------------------------------------------------------------------- ##
