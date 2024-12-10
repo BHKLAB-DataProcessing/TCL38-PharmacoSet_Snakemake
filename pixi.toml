@@ -16,7 +16,9 @@ graphs = { depends_on = [
   "filegraph",
 ], description = "Generate all the graphs" }
 
-
+[tasks.snake]
+cmd = "snakemake -c 8 --use-conda"
+description = "Run the snakemake pipeline"
 
 [dependencies]
 r-base = "*"

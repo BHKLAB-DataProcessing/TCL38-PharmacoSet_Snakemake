@@ -92,3 +92,7 @@ rule get_MAE:
     "logs/get_MAE.log"
   script:
     "workflow/scripts/get_MAE.R"
+
+rule clean:
+  shell:
+    "rm -rf procdata results"

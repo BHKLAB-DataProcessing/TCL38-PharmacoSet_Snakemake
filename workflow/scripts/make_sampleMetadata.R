@@ -58,8 +58,7 @@ warn(logger, paste("The following samples are missing from the annotation databa
 
 ### MANUAL FIXES ###
 warn(logger, "Applying manual fixes...")
-mapped[query =="CCRFHSB2"]$accession <- "CVCL_1859"
-mapped[query =="MYLA"]$accession <- "CVCL_5342"
+mapped[query =="MyLa"]$accession <- "CVCL_5341"
 info(logger, "Manual fixes applied.")
 
 # old columns in `sample`

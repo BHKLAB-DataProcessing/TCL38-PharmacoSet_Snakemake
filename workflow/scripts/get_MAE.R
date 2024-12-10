@@ -24,8 +24,6 @@ logger <- create.logger(logfile = stdout(), level = "DEBUG")
 info(logger, "Starting process...")
 suppressMessages(library(data.table))
 suppressMessages(library(S4Vectors))
-suppressMessages(library(CoreGx))
-suppressMessages(library(PharmacoGx))
 suppressMessages(library(readxl))
 suppressMessages(library(reshape2))
 
@@ -36,7 +34,7 @@ info(logger, "Loading input files...")
 variantcall <- readRDS(INPUT$variantcall)
 rnaseq <- readRDS(INPUT$rnaseq)
 atac <- readRDS(INPUT$atac)
-acgh_oldSE <- readRDS(INPUT$acgh)
+acgh <- readRDS(INPUT$acgh)
 
 sample_metadata <- read_excel(INPUT$samplemetadata, sheet=1) |> as.data.frame()
 rownames(sample_metadata) <- sample_metadata$sampleid
@@ -68,7 +66,6 @@ var <- var[-which(var$Gene.refGene == "RPL21" & var$Chr == "10"),]
 elementMetadata <- data.frame(gene_name = var$Gene.refGene, chr = var$Chr)
 rownames(elementMetadata) <- rownames(var) <- var$Gene.refGene
 var$Gene.refGene <- var$Chr <- NULL
-colnames(var) <- toupper(gsub("\\.", "", colnames(var)))
 colData <- data.frame(sampleid = colnames(var))
 rownames(colData) <- colnames(var)
 colData$batchid <- 1
@@ -98,15 +95,13 @@ atacSE <- SummarizedExperiment::SummarizedExperiment(
 info(logger, "ATAC-seq SummarizedExperiment object created")
 
 info(logger, "Creating SummarizedExperiment object for aCGH data...")
-acgh <- acgh_oldSE
 assay <- acgh@assays@data$assay
 elementMetadata <- acgh@elementMetadata
 colData <- acgh@colData
-colnames(assay) <- toupper(gsub("_", "", colnames(assay)))
 assay <- assay[,order(colnames(assay))]
-colData$sampleid <- toupper(gsub("_", "", colData$cell))
-rownames(colData) <- colData$sampleid
-colData <- colData[order(rownames(colData)),]
+# rownames(colData) <- colData$sampleid
+
+# colData <- colData[order(rownames(colData)),]
 colData$batchid <- 1
 
 acghSE <- SummarizedExperiment::SummarizedExperiment(
