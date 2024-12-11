@@ -6,7 +6,10 @@ METADATA =  Path("metadata")
 RESULTS = Path("results")
 
 configfile: "config/tcl38.yaml"
-
+annotationGx_conda = "workflow/envs/annotationgx.yaml"
+pharmacoGx_conda = "workflow/envs/pharmacoset.yaml"
+treatmentResponse_conda = "workflow/envs/treatmentResponse.yaml"
+r_essential_conda = "workflow/envs/r-essential.yaml"
 
 rule make_PSET:
   input:
@@ -18,6 +21,8 @@ rule make_PSET:
     pset = RESULTS / "TCL38_PSet.RDS"
   log:
     "logs/make_PSET.log"
+  conda:
+    pharmacoGx_conda
   script:
     "workflow/scripts/make_PSET.R"
 
@@ -31,7 +36,7 @@ rule make_treatmentMetadata:
   log:
     "logs/make_treatmentMetadata.log"
   conda:
-    "workflow/envs/annotationgx.yaml"
+    annotationGx_conda
   threads:
     4
   script:
@@ -45,7 +50,7 @@ rule make_sampleMetadata:
   log:
     "logs/make_sampleMetadata.log"
   conda:
-    "workflow/envs/annotationgx.yaml"
+    annotationGx_conda
   threads:
     4
   script:
@@ -59,6 +64,8 @@ rule make_TRE:
     tre = PROCDATA / "TCL38_TRE.RDS"
   log:
     "logs/make_TRE.log"
+  conda:
+    treatmentResponse_conda
   script:
     "workflow/scripts/make_TRE.R"
 
@@ -80,6 +87,8 @@ rule process_monotherapy:
     mono_processed = PROCDATA / "mono_treatment_response.csv"
   log:
     "logs/process_monotherapy.log"
+  conda:
+    r_essential_conda
   script:
     "workflow/scripts/process_monotherapy.R"
 
@@ -94,6 +103,8 @@ rule get_MAE:
     mae= PROCDATA / "TCL38_MAE.RDS"
   log:
     "logs/get_MAE.log"
+  conda:
+    treatmentResponse_conda
   script:
     "workflow/scripts/get_MAE.R"
 
@@ -203,4 +214,4 @@ rule download_all:
 
 rule clean:
   shell:
-    "rm -rf procdata results"
+    "rm -rf procdata results rawdata metadata"

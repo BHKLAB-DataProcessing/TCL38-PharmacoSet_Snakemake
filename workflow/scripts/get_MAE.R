@@ -23,7 +23,6 @@ library(log4r)
 logger <- create.logger(logfile = stdout(), level = "DEBUG")
 info(logger, "Starting process...")
 suppressMessages(library(data.table))
-suppressMessages(library(S4Vectors))
 suppressMessages(library(readxl))
 suppressMessages(library(reshape2))
 
