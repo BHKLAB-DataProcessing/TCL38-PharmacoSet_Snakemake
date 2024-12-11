@@ -99,19 +99,28 @@ sample_df <- data.frame(
 
 name <- "TCL38"
 
-pset <- PharmacoGx::PharmacoSet2(
-  name = name,
-  treatment = treatment_df,
-  sample = sample_df,
-  molecularProfiles = mae,
-  treatmentResponse = tre,
-  curation = list(
-    sample = sample_df,
-    treatment = treatment_df,
-    tissue = data.frame()
-  ),
-  datasetType = "sensitivity"
-)
+tryCatch({
+  capture.output({
+    pset <- PharmacoGx::PharmacoSet2(
+      name = name,
+      treatment = treatment_df,
+      sample = sample_df,
+      molecularProfiles = mae,
+      treatmentResponse = tre,
+      curation = list(
+        sample = sample_df,
+        treatment = treatment_df,
+        tissue = data.frame()
+      ),
+      datasetType = "sensitivity"
+    )
+  }, type = "message", file = textConnection("stdout_msgs"))
+}, error = function(e) {
+  error(logger, sprintf("Error creating PharmacoSet: %s", e$message))
+  stop(e)
+}, warning = function(w) {
+  warn(logger, sprintf("Warning during PharmacoSet creation: %s", w$message))
+})
 
 ###############################################################################
 # Save OUTPUT 

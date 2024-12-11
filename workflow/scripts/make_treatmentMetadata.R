@@ -86,7 +86,7 @@ combined_raw_treatment <- combined_raw_treatment[, ..order_col]
 info(logger, "Combined raw treatment data created.")
 
 # capitalize sampleid
-combined_raw_treatment$sampleid <- toupper(combined_raw_treatment$sampleid)
+combined_raw_treatment$sampleid <- combined_raw_treatment$sampleid
 
 t1 <- combined_raw_treatment$treatment1id |> unique()
 t2 <- combined_raw_treatment$treatment2id |> unique()

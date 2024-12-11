@@ -99,9 +99,10 @@ assay <- acgh@assays@data$assay
 elementMetadata <- acgh@elementMetadata
 colData <- acgh@colData
 assay <- assay[,order(colnames(assay))]
-# rownames(colData) <- colData$sampleid
 
-# colData <- colData[order(rownames(colData)),]
+# create sampleid
+colData$sampleid <- rownames(colData)
+
 colData$batchid <- 1
 
 acghSE <- SummarizedExperiment::SummarizedExperiment(

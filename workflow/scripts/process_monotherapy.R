@@ -39,21 +39,20 @@ info(logger, "Starting process...")
 # load in drug sensitivity data and format drug and sample names
 info(logger, "Loading drug sensitivity data...")
 
-dss <- readxl::read_excel(INPUT$raw, sheet = 1)
+dss <- readxl::read_excel(INPUT$raw, sheet = 1) |> setDT()
 
 ###############################################################################
 # Main Script
 ###############################################################################
 info(logger, "Processing drug sensitivity data...")
-
-dss$DRUG <- gsub(" ", "_", dss$DRUG)
-colnames(dss) <- toupper(gsub("-", "", colnames(dss)))
-colnames(dss)[colnames(dss) == "OCILY13.2"] <- "OCILY132"
+data.table::setnames(dss,
+                     c("HuT78", "Karpas299", "Karpas384", "PEER"),
+                     c("HUT-78", "Karpas 299", "Karpas 384", "Peer"))
 
 # create data.table object
 info(logger, "Creating data.table object...")
 
-raw_single_dt <- melt(dss) |> setDT()
+raw_single_dt <- reshape2::melt(dss) |> setDT()
 colnames(raw_single_dt) <- c("treatmentid", "sampleid", "dss")
 
 ###############################################################################

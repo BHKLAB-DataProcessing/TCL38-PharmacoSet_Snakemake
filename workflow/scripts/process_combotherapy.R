@@ -36,6 +36,12 @@ info(logger, "Starting process...")
 ###############################################################################
 # Load INPUT
 ###############################################################################
+info(logger, "Loading sample metadata from input file...")
+sample <- readxl::read_excel(INPUT$samplemetadata, sheet = 1) |>
+  data.table::as.data.table()
+info(logger, "Sample metadata loaded successfully.")
+
+
 info(logger, "Loading input files...")
 raw_zip <- INPUT$raw
 
@@ -62,7 +68,6 @@ prefixes <- paste(prefix_1, prefix_2, sep = "|")
 info(logger, "Processing files...")
 raw_combo_dt <- lapply(files, function(file){
   base_name <- fs::path_file(file)
-  # sampleid <- gsub("\\..*", "", gsub("_.*", "", gsub(prefix_1, "", gsub(prefix_2, "", base_name))))
 
   sampleid <- gsub(prefixes, "", base_name) |>
     gsub("\\..*", "",x= _) |>
@@ -80,6 +85,15 @@ raw_combo_dt <- lapply(files, function(file){
   df
 }) |> data.table::rbindlist(use.names = TRUE, fill = TRUE)
 info(logger, "All files processed and combined into a data table.")
+
+# map sample names
+sample$toMap <- gsub("-", "", gsub(" ", "", sample$sampleid)) 
+sample$toMap[sample$toMap == "HUT78"] = "Hut78"
+sample$toMap[sample$toMap == "MOLT4"] = "Molt4"
+sample$toMap[sample$toMap == "OCILy13.2"] = "OciLy132"
+sample$toMap[sample$toMap == "Peer"] = "PEER"
+
+raw_combo_dt$sampleid <- sample$sampleid[match(raw_combo_dt$sampleid, sample$toMap)]
 
 ###############################################################################
 # Save OUTPUT 

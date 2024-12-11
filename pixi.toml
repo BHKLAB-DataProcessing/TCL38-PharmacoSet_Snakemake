@@ -16,6 +16,11 @@ graphs = { depends_on = [
   "filegraph",
 ], description = "Generate all the graphs" }
 
+
+[tasks.dryrun]
+cmd = "snakemake -c 8 --dryrun --use-conda"
+description = "Run the snakemake pipeline in dryrun mode"
+
 [tasks.snake]
 cmd = "snakemake -c 8 --use-conda"
 description = "Run the snakemake pipeline"
@@ -35,3 +40,4 @@ r-rmarkdown = "*"
 snakemake = ">=8.25.5,<9"
 bioconductor-pharmacogx = ">=3.6.0,<4"
 r-log4r = ">=0.4.4,<0.5"
+aiohttp = ">=3.11.10,<4"
