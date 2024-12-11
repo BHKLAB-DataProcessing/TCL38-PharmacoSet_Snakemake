@@ -13,3 +13,4 @@ logs
 *.RData
 *.Rhistory
 old_rawdata
+metadata
