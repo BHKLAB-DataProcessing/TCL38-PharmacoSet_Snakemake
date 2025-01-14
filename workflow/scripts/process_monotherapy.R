@@ -13,7 +13,7 @@ if(exists("snakemake")){
     sink(
       file = snakemake@log[[1]], 
       append = FALSE, 
-      type = c("output", "message"), 
+      type = c("output"), 
       split = TRUE
   )
 
@@ -36,18 +36,25 @@ info(logger, "Starting process...")
 ###############################################################################
 # Load INPUT
 ###############################################################################
+# load in cell line metadata
+info(logger, "Loading sample metadata from input file...")
+sample_metadata <- read.csv(INPUT$samplemetadata) |> as.data.frame()
+rownames(sample_metadata) <- sample_metadata$sampleid <- sample_metadata$cellosaurus.accession
+
 # load in drug sensitivity data and format drug and sample names
 info(logger, "Loading drug sensitivity data...")
 
 dss <- readxl::read_excel(INPUT$raw, sheet = 1) |> setDT()
+data.table::setnames(dss,
+                     c("HuT78", "Karpas299", "Karpas384", "PEER"),
+                     c("Hut78", "Karpas299", "Karpas384", "Peer"))
+
+colnames(dss)[2:39] <- sample_metadata$sampleid[match(colnames(dss)[2:39], sample_metadata$Cell.Line)]
 
 ###############################################################################
 # Main Script
 ###############################################################################
 info(logger, "Processing drug sensitivity data...")
-data.table::setnames(dss,
-                     c("HuT78", "Karpas299", "Karpas384", "PEER"),
-                     c("HUT-78", "Karpas 299", "Karpas 384", "Peer"))
 
 # create data.table object
 info(logger, "Creating data.table object...")

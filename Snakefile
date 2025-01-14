@@ -71,7 +71,7 @@ rule make_TRE:
 
 rule process_combotherapy:
   input:
-    samplemetadata= METADATA / "sample-metadata.xlsx",
+    samplemetadata= PROCDATA / "sample-metadata.csv",
     raw = RAWDATA / "ViabilityCombinationsTCL38.zip"
   output:
     combo_processed = PROCDATA / "combo_treatment_response.csv"
@@ -83,6 +83,7 @@ rule process_combotherapy:
 rule process_monotherapy:
   input:
     raw = RAWDATA / "DSS_all_corrected_TC38.xlsx",
+    samplemetadata = PROCDATA / "sample-metadata.csv"
   output:
     mono_processed = PROCDATA / "mono_treatment_response.csv"
   log:
@@ -94,7 +95,7 @@ rule process_monotherapy:
 
 rule get_MAE:
   input:
-    samplemetadata= METADATA / "sample-metadata.xlsx",
+    samplemetadata= PROCDATA / "sample-metadata.csv",
     variantcall= RAWDATA / "VariantCallsTCL.RDS",
     rnaseq= RAWDATA / "TCL_RNA.RDS",
     atac= RAWDATA / "atac2_transformed_rnagene_peaks_all_TSS.RDS",

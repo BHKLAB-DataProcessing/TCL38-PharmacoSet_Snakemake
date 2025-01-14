@@ -14,3 +14,4 @@ logs
 *.Rhistory
 old_rawdata
 metadata
+temp

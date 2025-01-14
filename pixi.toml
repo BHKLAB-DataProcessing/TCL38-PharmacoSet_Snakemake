@@ -10,7 +10,7 @@ version = "0.1.0"
 dag = "snakemake -F --dag | dot -Tsvg > resources/dag.svg"
 rulegraph = "snakemake -F --rulegraph | dot -Tsvg > resources/rulegraph.svg"
 filegraph = "snakemake -F --filegraph | dot -Tsvg > resources/filegraph.svg"
-graphs = { depends_on = [
+graphs = { depends-on = [
   "dag",
   "rulegraph",
   "filegraph",
@@ -18,7 +18,7 @@ graphs = { depends_on = [
 
 
 [tasks.dryrun]
-cmd = "snakemake -c 8 --dryrun --use-conda"
+cmd = "snakemake -c 8 --dryrun --use-conda --show-failed-logs --printshellcmds"
 description = "Run the snakemake pipeline in dryrun mode"
 
 [tasks.snake]
@@ -41,3 +41,4 @@ snakemake = ">=8.25.5,<9"
 bioconductor-pharmacogx = ">=3.6.0,<4"
 r-log4r = ">=0.4.4,<0.5"
 aiohttp = ">=3.11.10,<4"
+conda = ">=24.11.2,<25"

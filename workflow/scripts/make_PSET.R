@@ -43,6 +43,7 @@ info(logger, "Monotherapy activity experiment loaded successfully.")
 
 
 sampleMetadata <- data.table::fread(INPUT$processed_sample_metadata)
+sampleMetadata$sampleid <- sampleMetadata$cellosaurus.accession
 info(logger, "Sample metadata loaded successfully.")
 
 treatmentMetadata <- data.table::fread(INPUT$processed_treatment_metadata)

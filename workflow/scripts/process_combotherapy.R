@@ -37,10 +37,9 @@ info(logger, "Starting process...")
 # Load INPUT
 ###############################################################################
 info(logger, "Loading sample metadata from input file...")
-sample <- readxl::read_excel(INPUT$samplemetadata, sheet = 1) |>
+sample <- read.csv(INPUT$samplemetadata) |>
   data.table::as.data.table()
 info(logger, "Sample metadata loaded successfully.")
-
 
 info(logger, "Loading input files...")
 raw_zip <- INPUT$raw
@@ -94,6 +93,7 @@ sample$toMap[sample$toMap == "OCILy13.2"] = "OciLy132"
 sample$toMap[sample$toMap == "Peer"] = "PEER"
 
 raw_combo_dt$sampleid <- sample$sampleid[match(raw_combo_dt$sampleid, sample$toMap)]
+raw_combo_dt$sampleid <- sample$cellosaurus.accession[match(raw_combo_dt$sampleid, sample$sampleid)]
 
 ###############################################################################
 # Save OUTPUT 

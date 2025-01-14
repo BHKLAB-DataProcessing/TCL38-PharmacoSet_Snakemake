@@ -35,8 +35,11 @@ rnaseq <- readRDS(INPUT$rnaseq)
 atac <- readRDS(INPUT$atac)
 acgh <- readRDS(INPUT$acgh)
 
-sample_metadata <- read_excel(INPUT$samplemetadata, sheet=1) |> as.data.frame()
-rownames(sample_metadata) <- sample_metadata$sampleid
+sample_metadata <- read.csv(INPUT$samplemetadata) |> as.data.frame()
+rownames(sample_metadata) <- sample_metadata$sampleid <- sample_metadata$cellosaurus.accession
+sample_metadata$Cell.Line[sample_metadata$Cell.Line == "Karpas299"] = "Karpas 299"
+sample_metadata$Cell.Line[sample_metadata$Cell.Line == "Karpas384"] = "Karpas 384"
+sample_metadata$Cell.Line[sample_metadata$Cell.Line == "Hut78"] = "HUT-78"
 info(logger, "Input files loaded successfully")
 
 ###############################################################################
@@ -45,6 +48,7 @@ info(logger, "Input files loaded successfully")
 
 info(logger, "Creating SummarizedExperiment object for RNA-seq data...")
 rna <- rnaseq[,order(colnames(rnaseq))]
+colnames(rna) <- sample_metadata$sampleid[match(colnames(rna), sample_metadata$Cell.Line)]
 elementMetadata <- data.frame(gene_name = rownames(rna))
 rownames(elementMetadata) <- rownames(rna)
 colData <- data.frame(sampleid = colnames(rna))
@@ -65,6 +69,7 @@ var <- var[-which(var$Gene.refGene == "RPL21" & var$Chr == "10"),]
 elementMetadata <- data.frame(gene_name = var$Gene.refGene, chr = var$Chr)
 rownames(elementMetadata) <- rownames(var) <- var$Gene.refGene
 var$Gene.refGene <- var$Chr <- NULL
+colnames(var) <- sample_metadata$sampleid[match(colnames(var), sample_metadata$Cell.Line)]
 colData <- data.frame(sampleid = colnames(var))
 rownames(colData) <- colnames(var)
 colData$batchid <- 1
@@ -79,6 +84,7 @@ info(logger, "Variant calls SummarizedExperiment object created")
 
 info(logger, "Creating SummarizedExperiment object for ATAC-seq data...")
 atac <- atac[,order(colnames(atac))]
+colnames(atac) <- sample_metadata$sampleid[match(colnames(atac), sample_metadata$Cell.Line)]
 elementMetadata <- data.frame(gene_name = rownames(atac))
 rownames(elementMetadata) <- rownames(atac)
 colData <- data.frame(sampleid = colnames(atac))
@@ -95,13 +101,12 @@ info(logger, "ATAC-seq SummarizedExperiment object created")
 
 info(logger, "Creating SummarizedExperiment object for aCGH data...")
 assay <- acgh@assays@data$assay
+assay <- assay[,order(colnames(assay))]
+colnames(assay) <- sample_metadata$sampleid[match(colnames(assay), sample_metadata$Cell.Line)]
 elementMetadata <- acgh@elementMetadata
 colData <- acgh@colData
-assay <- assay[,order(colnames(assay))]
-
-# create sampleid
-colData$sampleid <- rownames(colData)
-
+colData$sampleid <- sample_metadata$sampleid[match(rownames(colData), sample_metadata$Cell.Line)]
+rownames(colData) <- colData$sampleid
 colData$batchid <- 1
 
 acghSE <- SummarizedExperiment::SummarizedExperiment(
